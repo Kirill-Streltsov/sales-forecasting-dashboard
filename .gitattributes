@@ -1,0 +1,8 @@
+# The notebook carries embedded output images, which makes it dominate GitHub's
+# byte-based language stats. Treat it as documentation so the language bar
+# reflects the actual Python codebase.
+*.ipynb linguist-documentation
+
+# Power BI project files are generated / hand-authored config, not source code
+# GitHub should count towards the language stats.
+powerbi/** linguist-documentation

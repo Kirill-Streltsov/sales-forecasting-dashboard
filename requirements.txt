@@ -1,0 +1,12 @@
+# Runtime dependencies for the hosted Streamlit dashboard, pinned to the exact
+# set verified locally, in CI and on Streamlit Community Cloud so the deployed
+# environment is fully reproducible. Target: Python 3.12.
+#
+# The dashboard reads the pre-computed forecast from outputs/, so Prophet is not
+# needed at runtime. It lives in requirements-dev.txt with the rest of the
+# training / analysis tooling.
+
+numpy==1.26.4
+pandas==2.2.3
+plotly==5.24.1
+streamlit==1.59.1

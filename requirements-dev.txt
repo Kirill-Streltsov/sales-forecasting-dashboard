@@ -1,0 +1,28 @@
+# Development, training and CI tooling. Installs the runtime set plus the
+# forecasting model, the Power BI push client and the test / notebook tooling.
+# The deployed app does not need any of this.
+-r requirements.txt
+
+# --- forecasting model ---
+# Prophet pulls in cmdstanpy + holidays; the forecast is trained offline with
+# scripts/train_forecast.py and exported to outputs/ as CSV.
+# cmdstanpy is pinned to 1.2.4 on purpose: prophet 1.1.6 ships a trimmed
+# cmdstan bundle without a makefile, and cmdstanpy 1.3.0 rejects that during
+# path validation. 1.2.4 uses the pre-compiled model as intended.
+prophet==1.1.6
+cmdstanpy==1.2.4
+holidays==0.100
+
+# --- Power BI push-dataset client ---
+requests==2.32.3
+
+# --- tests / linting ---
+pytest==8.3.5
+ruff==0.9.6
+
+# --- notebooks ---
+matplotlib==3.9.4
+jupyter==1.1.1
+nbconvert==7.16.6
+ipykernel==6.29.5
+nbformat==5.10.4
