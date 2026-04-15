@@ -1,0 +1,20 @@
+{
+  "backtest": {
+    "mae": 2148.8044162163774,
+    "rmse": 2973.462611902501,
+    "wape_pct": 69.79770025274581,
+    "total_actual": 277075.60099999997,
+    "total_pred": 242034.19381699926,
+    "total_error_pct": -12.646875818921604,
+    "horizon_days": 90,
+    "train_days": 1368
+  },
+  "interval_width": 0.9,
+  "horizon_days": 90,
+  "holiday_country": "US",
+  "history_start": "2015-01-03",
+  "history_end": "2018-12-30",
+  "n_order_lines": 9994,
+  "n_orders": 5009,
+  "total_sales": 2297200.8603000003
+}
