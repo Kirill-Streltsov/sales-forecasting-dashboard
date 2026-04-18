@@ -1,0 +1,91 @@
+// ===========================================================================
+// Sales Forecasting - DAX measures
+// ---------------------------------------------------------------------------
+// Semantic model:
+//   Orders    fact table, one row per product line (the Superstore extract)
+//   Date      date dimension, marked as a date table on [Date]
+//   Forecast  the Prophet output loaded from outputs/forecast.csv
+//
+// These measures mirror forecasting/features.py one-for-one, so the Power BI
+// report and the Streamlit app report identical numbers.
+// ===========================================================================
+
+
+// --- core sales / profit ---------------------------------------------------
+
+Total Sales = SUM ( Orders[Sales] )
+
+Total Profit = SUM ( Orders[Profit] )
+
+Total Quantity = SUM ( Orders[Quantity] )
+
+Profit Margin = DIVIDE ( [Total Profit], [Total Sales] )
+
+
+// --- orders ----------------------------------------------------------------
+// One order usually spans several product rows, so the order count is a
+// distinct count of the order id rather than a row count.
+
+Orders = DISTINCTCOUNT ( Orders[Order ID] )
+
+Avg Order Value = DIVIDE ( [Total Sales], [Orders] )
+
+
+// --- year over year --------------------------------------------------------
+// Needs the Date table marked as a date table so the time-intelligence
+// functions have a contiguous calendar to work with.
+
+Sales PY =
+    CALCULATE ( [Total Sales], SAMEPERIODLASTYEAR ( 'Date'[Date] ) )
+
+Sales YoY = [Total Sales] - [Sales PY]
+
+Sales YoY % = DIVIDE ( [Sales YoY], [Sales PY] )
+
+
+// --- forecast --------------------------------------------------------------
+// The Forecast table carries the whole fitted line; is_forecast = TRUE marks
+// the three-month horizon beyond the last actual. yhat_lower / yhat_upper are
+// the bounds of the 90% confidence interval.
+
+Forecast Sales =
+    CALCULATE ( SUM ( Forecast[yhat] ), Forecast[is_forecast] = TRUE () )
+
+Forecast Lower =
+    CALCULATE ( SUM ( Forecast[yhat_lower] ), Forecast[is_forecast] = TRUE () )
+
+Forecast Upper =
+    CALCULATE ( SUM ( Forecast[yhat_upper] ), Forecast[is_forecast] = TRUE () )
+
+// One continuous line for the trend visual: actuals where we have them, the
+// forecast where we do not.
+Sales or Forecast =
+    VAR Actual = [Total Sales]
+    RETURN
+        IF ( ISBLANK ( Actual ) || Actual = 0, [Forecast Sales], Actual )
+
+
+// --- Date table ------------------------------------------------------------
+// Calculated table; after creating it, mark it as a date table on [Date].
+
+Date =
+    ADDCOLUMNS (
+        CALENDAR ( DATE ( 2015, 1, 1 ), DATE ( 2019, 3, 31 ) ),
+        "Year", YEAR ( [Date] ),
+        "Month", FORMAT ( [Date], "MMM" ),
+        "Month No", MONTH ( [Date] ),
+        "Quarter", "Q" & FORMAT ( [Date], "Q" ),
+        "Year Month", FORMAT ( [Date], "YYYY-MM" )
+    )
+
+
+// --- row-level security ----------------------------------------------------
+// Table filter DAX for the "Region manager" role on the Orders table, so a
+// signed-in manager only ever sees their own region. Maps the signed-in user
+// to a region through a small UserRegion mapping table:
+//
+//   [Region] =
+//       LOOKUPVALUE (
+//           UserRegion[Region],
+//           UserRegion[Email], USERPRINCIPALNAME ()
+//       )
