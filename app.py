@@ -358,6 +358,5 @@ with tab_powerbi:
 st.divider()
 st.caption(
     "Built with pandas, Prophet, Plotly and Streamlit, with a matching Power BI "
-    "report. Educational demo on a public dataset, so check the numbers before "
-    "acting on any single forecast."
+    "report."
 )
