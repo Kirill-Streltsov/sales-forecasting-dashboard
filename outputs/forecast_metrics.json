@@ -6,6 +6,10 @@
     "total_actual": 277075.60099999997,
     "total_pred": 242034.19381699926,
     "total_error_pct": -12.646875818921604,
+    "interval_coverage_pct": 81.11111111111111,
+    "naive_wape_pct": 70.0673760155446,
+    "naive_total_pred": 216864.36780000004,
+    "naive_total_error_pct": -21.730976304911067,
     "horizon_days": 90,
     "train_days": 1368
   },

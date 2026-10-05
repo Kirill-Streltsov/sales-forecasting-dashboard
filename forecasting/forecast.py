@@ -96,6 +96,14 @@ def backtest(
     Reports MAE and RMSE in dollars and WAPE (weighted absolute percentage
     error, ``sum|e| / sum|y|``). WAPE is used instead of MAPE because many
     individual days have zero sales, which would make a plain MAPE blow up.
+
+    Two checks put those numbers in context:
+
+    * a seasonal-naive baseline - each held-out day predicted by the same
+      weekday 52 weeks earlier - scored the same way, so it is clear whether
+      Prophet beats the obvious "same as last year" guess;
+    * the coverage of the confidence interval, i.e. the share of held-out days
+      whose actual sales fall inside it (ideally close to ``interval_width``).
     """
     if len(prophet_df) <= horizon_days + 30:
         raise ValueError("Series too short to hold out a full horizon for backtesting.")
@@ -109,8 +117,11 @@ def backtest(
     forecast = _predict(model, future).set_index("ds")
 
     pred = forecast.loc[test["ds"], "yhat"].clip(lower=0.0).to_numpy()
+    lower = forecast.loc[test["ds"], "yhat_lower"].clip(lower=0.0).to_numpy()
+    upper = forecast.loc[test["ds"], "yhat_upper"].to_numpy()
     actual = test["y"].to_numpy()
     error = actual - pred
+    coverage = float(np.mean((actual >= lower) & (actual <= upper)) * 100)
 
     mae = float(np.mean(np.abs(error)))
     rmse = float(np.sqrt(np.mean(error**2)))
@@ -135,9 +146,31 @@ def backtest(
         "total_actual": total_actual,
         "total_pred": total_pred,
         "total_error_pct": total_error_pct,
+        "interval_coverage_pct": coverage,
+        **_seasonal_naive_scores(train, test),
         "horizon_days": int(horizon_days),
         "train_days": int(len(train)),
     }
+
+
+def _seasonal_naive_scores(train: pd.DataFrame, test: pd.DataFrame) -> dict[str, float]:
+    """Score the "same weekday 52 weeks ago" baseline on the held-out days.
+
+    364 days rather than 365 keeps the day of the week aligned, which matters
+    for a series with a strong weekly pattern. NaN when the history is shorter
+    than a year.
+    """
+    history = train.set_index("ds")["y"]
+    lagged = history.reindex(test["ds"] - pd.Timedelta(days=364)).to_numpy()
+    actual = test["y"].to_numpy()
+    keys = ("naive_wape_pct", "naive_total_pred", "naive_total_error_pct")
+    if np.isnan(lagged).any() or not actual.sum():
+        return dict.fromkeys(keys, float("nan"))
+    total_actual = float(actual.sum())
+    total_naive = float(lagged.sum())
+    wape = float(np.sum(np.abs(actual - lagged)) / total_actual * 100)
+    total_error = (total_naive - total_actual) / total_actual * 100
+    return dict(zip(keys, (wape, total_naive, total_error), strict=True))
 
 
 def build_daily_and_forecast(

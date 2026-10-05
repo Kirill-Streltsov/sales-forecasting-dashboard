@@ -61,3 +61,20 @@ def test_backtest_rejects_short_series():
         pass
     else:
         raise AssertionError("expected ValueError for a too-short series")
+
+
+def test_backtest_reports_baseline_and_coverage(synthetic_daily):
+    scores = forecast.backtest(synthetic_daily, horizon_days=HORIZON)
+    assert 0.0 <= scores["interval_coverage_pct"] <= 100.0
+    # The synthetic series is a clean trend + weekly pattern, which Prophet
+    # should model far better than "same weekday a year ago" (missing the trend).
+    assert math.isfinite(scores["naive_wape_pct"])
+    assert scores["wape_pct"] < scores["naive_wape_pct"]
+
+
+def test_naive_baseline_needs_a_year_of_history():
+    short = pd.DataFrame(
+        {"ds": pd.date_range("2020-01-01", periods=200, freq="D"), "y": 1.0}
+    )
+    scores = forecast.backtest(short, horizon_days=HORIZON)
+    assert math.isnan(scores["naive_wape_pct"])

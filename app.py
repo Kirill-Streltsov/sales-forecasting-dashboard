@@ -276,6 +276,13 @@ with tab_forecast:
                 f"actual; day-level error is naturally higher (WAPE "
                 f"{bt['wape_pct']:.0f}%) because daily sales are spiky."
             )
+            if "naive_total_error_pct" in bt:
+                note += (
+                    " For comparison, repeating the same weekdays a year earlier "
+                    f"misses the total by {abs(bt['naive_total_error_pct']):.1f}%. "
+                    f"The 90% interval held {bt['interval_coverage_pct']:.0f}% of "
+                    "the held-out days, so it is somewhat too narrow."
+                )
         st.caption(note)
 
 
