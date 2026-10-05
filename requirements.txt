@@ -10,3 +10,6 @@ numpy==1.26.4
 pandas==2.2.3
 plotly==5.24.1
 streamlit==1.59.1
+# pyarrow comes in through streamlit. 25.0.0 segfaults when streamlit converts a
+# cached DataFrame for a chart on a script rerun, so it is held at 24.
+pyarrow==24.0.0
