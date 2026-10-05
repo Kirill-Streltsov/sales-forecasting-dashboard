@@ -48,7 +48,11 @@ Grouped in `dax_measures.dax`:
 - **Year over year** - Sales PY, Sales YoY, Sales YoY % using
   `SAMEPERIODLASTYEAR`.
 - **Forecast** - Forecast Sales / Lower / Upper (filtered to the future
-  horizon), and Sales or Forecast for a single continuous trend line.
+  horizon), and Sales or Forecast for a single continuous trend line. The
+  Forecast table stacks 20 slices (each region x category plus the "All"
+  roll-ups), so these measures keep only the slice that matches the region and
+  category selected on Orders, and the "All" roll-up when nothing is selected.
+  Summing the table unfiltered would count each day about four times.
 
 ## Report pages
 
@@ -72,9 +76,10 @@ Region  ->  Category  ->  Sub-Category
 
 ## Row-level security
 
-A **Region manager** role filters the Orders table to a single region, so a
-signed-in manager only ever sees their own numbers. The table filter DAX is at
-the bottom of `dax_measures.dax`; it maps the signed-in user to a region
+A **Region manager** role filters both the Orders and the Forecast table to a
+single region, so a signed-in manager only ever sees their own numbers,
+including their own forecast and not the company-wide one. The table filter DAX
+is at the bottom of `dax_measures.dax`; it maps the signed-in user to a region
 through a small `UserRegion` mapping table. Roles are tested in Desktop with
 "View as role" and enforced after publishing to the Power BI Service.
 
