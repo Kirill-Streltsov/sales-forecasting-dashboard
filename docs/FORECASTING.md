@@ -16,8 +16,13 @@ about 220 are genuine no-order days.
 Prophet with three components modelled separately, which is what the resume
 describes:
 
-- **Weekly seasonality** - the day-of-week pattern. Superstore sells much less
-  at weekends, and this soaks that up instead of leaving it in the noise.
+- **Weekly seasonality** - the day-of-week pattern, which is strong here and
+  not the usual weekday/weekend split: Thursday and Friday are the weak days
+  (no orders at all on about 40% of them, averages of $690 and $1,160) while
+  Saturday and Tuesday are the strongest (about $2,050). The dates in this
+  sample extract appear to be shifted, so the pattern says little about real
+  shopping habits, but modelling it soaks it up instead of leaving it in the
+  noise.
 - **Yearly seasonality** - the within-year shape, including the Q4 ramp.
 - **US public holidays** - added with `add_country_holidays`, so spikes and
   dips around holidays get their own component rather than distorting the

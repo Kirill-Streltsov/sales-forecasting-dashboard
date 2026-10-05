@@ -1,7 +1,7 @@
 """Load and clean the raw Superstore orders, and build daily sales series.
 
 The raw file is the classic US "Sample - Superstore" extract: 9,994 order lines
-from 2014 to 2017 with one row per product in an order. A few things are worth
+from 2015 to 2018 with one row per product in an order. A few things are worth
 handling explicitly:
 
 * ``Order Date`` and ``Ship Date`` arrive as ``M/D/YYYY`` strings -> parsed to
