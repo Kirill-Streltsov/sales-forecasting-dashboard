@@ -335,8 +335,10 @@ with tab_powerbi:
 
         A Power BI report needs a paid license or the Windows desktop app to
         open, so it cannot be hosted for free in a browser. This Streamlit app
-        is the openly clickable version; the Power BI project files, the DAX
-        measures and the push script all live in the repo under `powerbi/`.
+        is the openly clickable version. The repo keeps the Power BI side as
+        text: the DAX measures and the model and report design under
+        `powerbi/`, and the script that loads the forecast into the dataset
+        under `scripts/`.
         """
     )
 
