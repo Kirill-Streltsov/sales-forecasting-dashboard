@@ -49,3 +49,7 @@ HOLIDAY_COUNTRY = "US"
 
 # Width of the forecast confidence interval (0.9 -> 90% interval).
 INTERVAL_WIDTH = 0.9
+
+# Prophet draws the interval by simulation; a fixed seed makes reruns produce
+# the same yhat_lower / yhat_upper (the point forecast is deterministic anyway).
+SEED = 42

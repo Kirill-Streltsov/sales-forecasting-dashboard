@@ -50,8 +50,13 @@ def fit_forecast(
     model = build_model(interval_width=interval_width, country=country)
     model.fit(prophet_df)
     future = model.make_future_dataframe(periods=horizon_days, freq="D")
-    forecast = model.predict(future)
-    return model, forecast
+    return model, _predict(model, future)
+
+
+def _predict(model: Prophet, future: pd.DataFrame) -> pd.DataFrame:
+    """``model.predict`` with a seeded uncertainty simulation (reproducible)."""
+    np.random.seed(config.SEED)
+    return model.predict(future)
 
 
 def forecast_frame(
@@ -101,7 +106,7 @@ def backtest(
     model = build_model(country=country)
     model.fit(train)
     future = model.make_future_dataframe(periods=horizon_days, freq="D")
-    forecast = model.predict(future).set_index("ds")
+    forecast = _predict(model, future).set_index("ds")
 
     pred = forecast.loc[test["ds"], "yhat"].clip(lower=0.0).to_numpy()
     actual = test["y"].to_numpy()
