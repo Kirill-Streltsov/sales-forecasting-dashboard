@@ -50,9 +50,24 @@ series, fits on the rest, and scores the forecast against the held-out days:
   (`sum|error| / sum|actual|`) is used instead of MAPE because many days have
   zero sales, which would make a plain MAPE blow up.
 
-Both numbers are written to `outputs/forecast_metrics.json` and the aggregate
-one is shown under the forecast chart in the app, so the day-level noise is not
-the only thing on display.
+Two more checks put these in context:
+
+- **A seasonal-naive baseline.** Predicting each held-out day with the same
+  weekday 52 weeks earlier misses the 90-day total by about 22%, against
+  Prophet's 13%, so the model clearly earns its keep on the number that
+  matters. Day by day the two are level (WAPE 70% each): no model predicts
+  which day a large order lands on.
+- **Interval coverage.** The 90% interval contains 81% of the held-out days,
+  so it is somewhat too narrow. That is expected from Prophet, whose interval
+  covers trend changes and noise but not the uncertainty in the seasonal
+  shape, and it is worth reading the band as optimistic.
+
+The interval is drawn by simulation, so `forecasting/forecast.py` seeds it;
+retraining reproduces `outputs/forecast.csv` exactly.
+
+All of these are written to `outputs/forecast_metrics.json`, and the aggregate
+ones are shown under the forecast chart in the app, so the day-level noise is
+not the only thing on display.
 
 ## What I would do next
 
@@ -62,3 +77,8 @@ the only thing on display.
   moves sales.
 - Cross-validate the horizon with `prophet.diagnostics` rather than a single
   hold-out.
+- Try multiplicative seasonality (sales grow about 20% a year, so the seasonal
+  swings probably grow with them) and widen the interval until its coverage
+  matches the nominal 90%.
+- Reconcile the slice forecasts so the regions add up to the "All" forecast;
+  today each slice is fitted on its own.

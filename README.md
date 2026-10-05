@@ -41,8 +41,10 @@ effects as separate components. Backtesting on a 90-day hold-out of the overall
 series, the forecast of the period total lands within about 13% of actual,
 which is the number a sales forecast is really judged on. The day-level error
 is higher (WAPE around 70%) because daily sales are spiky - one large order can
-swing a single day - so the app leads with the aggregate figure. There are more
-notes in [docs/FORECASTING.md](docs/FORECASTING.md).
+swing a single day - so the app leads with the aggregate figure. A simple
+"same weekdays last year" baseline misses the same total by about 22%, and the
+90% interval holds 81% of the held-out days, so it runs a little narrow. There
+are more notes in [docs/FORECASTING.md](docs/FORECASTING.md).
 
 ## Power BI
 
