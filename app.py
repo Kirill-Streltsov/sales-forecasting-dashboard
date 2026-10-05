@@ -243,8 +243,9 @@ with tab_forecast:
         # Compare against the same three months a year earlier, not the prior 90
         # days: Q1 against Q4 would look like a crash when it is just the normal
         # seasonal dip, whereas year-over-year isolates real growth.
-        py_start = future["ds"].min() - pd.Timedelta(days=365)
-        py_end = future["ds"].max() - pd.Timedelta(days=365)
+        # Calendar year, not 365 days, so leap years line up too.
+        py_start = future["ds"].min() - pd.DateOffset(years=1)
+        py_end = future["ds"].max() - pd.DateOffset(years=1)
         same_ly = float(
             history.loc[
                 history["ds"].between(py_start, py_end), "actual"
